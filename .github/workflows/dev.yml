@@ -1,0 +1,37 @@
+name: Development Deploy
+
+on:
+  pull_request:
+    types: [synchronize, opened, reopened, ready_for_review, labeled]
+  push:
+    branches:
+      - staging
+jobs:
+  quality-gate-template:
+    runs-on: ubuntu-latest
+    name: Template - DEV
+
+    defaults:
+      run:
+        working-directory: ./src
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Yarn Audit
+        run: yarn audit --groups "dependencies"
+
+      - name: Yarn Install
+        run: yarn
+
+      - name: Checking Lint code
+        run: yarn lint
+
+      - name: Run Tests
+        run: yarn test
